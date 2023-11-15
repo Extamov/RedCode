@@ -13,7 +13,7 @@ class AlarmWindow:
         self.root_frame = None
         self.label_object = None
         self.texts = []
-        Thread(target=self._initialize).start()
+        Thread(target=self._initialize, daemon=True).start()
         sleep(0.3)
 
     def _initialize(self):
@@ -67,14 +67,13 @@ wind = AlarmWindow()
 assets_location = resources.files(assets)
 
 def show_notification(cities, is_progressive):
-    if len(cities) > 0:
-        print(f"[{datetime.now()}]: {' | '.join(cities) if type(cities) == list else cities}")
+    current_all_cities = set(("\n".join(wind.texts)).split("\n"))
+    new_all_cities = set(cities if type(cities) == list else cities.split("\n"))
 
     wind.add_alarm("\n".join(cities) if type(cities) == list else cities, is_progressive)
 
-    current_all_cities = set(("\n".join(wind.texts)).split("\n"))
-    new_all_cities = set(cities if type(cities) == list else cities.split("\n"))
-    if is_progressive or not new_all_cities.issubset(current_all_cities):
+    if (is_progressive or not new_all_cities.issubset(current_all_cities)) and len(cities) > 0:
+        print(f"[{datetime.now()}]: {' | '.join(cities) if type(cities) == list else cities}")
         PlaySound(path.join(assets_location, "alert_sound.wav"), SND_FILENAME | SND_ASYNC)
 
 def show_error(msg):

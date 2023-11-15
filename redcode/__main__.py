@@ -1,6 +1,6 @@
 import asyncio
 from json import JSONDecodeError
-from aiohttp import ClientConnectionError
+from aiohttp import ClientConnectionError, WSServerHandshakeError
 from os import system
 from .lib import show_notification, show_error, createAIOSession, messageAutoCheck, clear
 from .providers import PROVIDERS
@@ -27,7 +27,7 @@ async def polling_thread(provider):
                         last_alert_ids.append(alert["id"])
                         last_alert_ids = last_alert_ids[-30:]
                         show_notification(alert["cities"], provider["is_progressive"])
-                if len(data["alerts"]) == 0:
+                if len(data["alerts"]) == 0 and not provider["is_progressive"]:
                     show_notification([], provider["is_progressive"])
                 await asyncio.sleep(0.5)
         except (ClientConnectionError, TimeoutError):
@@ -59,9 +59,9 @@ async def websocket_thread(provider):
                             last_alert_ids.append(alert["id"])
                             last_alert_ids = last_alert_ids[-30:]
                             show_notification(alert["cities"], provider["is_progressive"])
-                    if len(data["alerts"]) == 0:
+                    if len(data["alerts"]) == 0 and not provider["is_progressive"]:
                         show_notification([], provider["is_progressive"])
-        except (ClientConnectionError, TimeoutError):
+        except (ClientConnectionError, TimeoutError, WSServerHandshakeError):
             print("Connection failed/forciblly closed, retrying...")
             await asyncio.sleep(1)
 
