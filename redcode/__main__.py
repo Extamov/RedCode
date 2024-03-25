@@ -1,13 +1,20 @@
 import asyncio
 from json import JSONDecodeError
-from aiohttp import ClientConnectionError, WSServerHandshakeError
-from os import system
-from .lib import show_notification, show_error, createAIOSession, messageAutoCheck, clear
+from aiohttp import ClientConnectionError, WSServerHandshakeError, ClientSession, ClientTimeout, TCPConnector
+import sys
+from .lib.notifications import show_error, show_notification
+from .lib.general import clear_terminal, message_ping_check, set_terminal_title
 from .providers import PROVIDERS
+
+def create_session():
+    sess = ClientSession(timeout=ClientTimeout(total=20), connector=TCPConnector(ttl_dns_cache=300), headers={
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+    })
+    return sess
 
 async def polling_thread(provider):
     last_alert_ids = []
-    session = createAIOSession()
+    session = create_session()
     while True:
         try:
             async with session.get(provider["connUrl"], headers=provider["optionalHeaders"]) as res:
@@ -37,14 +44,14 @@ async def polling_thread(provider):
 
 async def websocket_thread(provider):
     last_alert_ids = []
-    session = createAIOSession()
+    session = create_session()
     while True:
         try:
             async with session.ws_connect(provider["connUrl"], headers=provider["optionalHeaders"], heartbeat=60) as websocket:
                 if "initFunc" in provider:
                     await provider["initFunc"](websocket)
                 async for message in websocket:
-                    if messageAutoCheck(message):
+                    if message_ping_check(message):
                         continue
 
                     try:
@@ -74,10 +81,10 @@ async def main():
         for index, provider in enumerate(PROVIDERS):
             print(f"[{index}] {provider['name']} [{provider['type']}] [{provider['displayUrl']}]")
         ans = input("Please select provider:")
-        clear()
+        clear_terminal()
     provider = PROVIDERS[int(ans)]
     title = f"{provider['name']} [{provider['type']}] [{provider['displayUrl']}]"
-    system(f"title {title}")
+    set_terminal_title(title)
     print(title)
     print("=" * len(title))
     if "polling" in provider["type"].lower():
@@ -86,7 +93,9 @@ async def main():
         await websocket_thread(provider)
 
 def entrypoint():
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    # Uses the same event loop policy as unix in windows
+    if sys.platform in ["win32", "cygwin", "msys"]:
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     asyncio.run(main())
 
 if __name__ == "__main__":

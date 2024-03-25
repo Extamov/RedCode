@@ -1,2 +1,4 @@
 asyncio
 aiohttp[speedups]
+numpy
+sounddevice
