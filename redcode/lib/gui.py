@@ -1,6 +1,7 @@
 from threading import Thread, Timer
 from tkinter import ttk, Tk
 from time import sleep
+import sys
 
 class AlarmWindow:
     def __init__(self):
@@ -37,6 +38,11 @@ class AlarmWindow:
 
     def change_text(self, new_text):
         old_text = self.label_object.cget("text")
+
+        # For some reason tkinter bidirectional text only works on Windows, so I had to reverse text for other OSes
+        if sys.platform not in ["win32", "cygwin", "msys"]:
+            new_text = "\n".join(map(lambda line: line[::-1], new_text.split("\n")))
+
         self.label_object.config(text=new_text)
         self.root_frame.update()
         screen_width = self.root_frame.winfo_screenwidth()
