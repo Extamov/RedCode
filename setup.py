@@ -3,7 +3,7 @@ import setuptools
 setuptools.setup(
     name="redcode",
     description="A software that alerts when there is an emergency in Israel.",
-    version="0.0.1",
+    version="0.0.2",
     author="Extamov",
     license="GPL-3.0",
     packages=setuptools.find_packages("."),
