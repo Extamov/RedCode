@@ -29,8 +29,8 @@ def parse_func(message):
             temp_alerts[alert_id] += list(alert["title"].values())
 
         alerts = []
-        for alert_key in temp_alerts.keys():
-            alerts.append({"id": alert_key, "cities": temp_alerts[alert_key]})
+        for (alert_key, alert_cities) in temp_alerts.items():
+            alerts.append({"id": alert_key, "cities": alert_cities})
 
         return {
             "title": title,
