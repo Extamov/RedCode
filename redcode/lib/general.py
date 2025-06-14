@@ -3,7 +3,7 @@ import sys
 from aiohttp import WSMsgType, ClientConnectionError, WSMessage
 
 def message_ping_check(message: WSMessage):
-    if message.data in [b"\xd0\x00", b"\x00\x00"] or message.type in [WSMsgType.PING, WSMsgType.PONG]:
+    if (message.data in [b"\xd0\x00", b"\x00\x00", b""] and message.type == WSMsgType.BINARY) or message.type in [WSMsgType.PING, WSMsgType.PONG]:
         return True
     if message.type in [WSMsgType.CLOSED, WSMsgType.ERROR]:
         raise ClientConnectionError()
