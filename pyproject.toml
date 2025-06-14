@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "redcode"
-version = "0.0.5"
+version = "0.0.6"
 description = "A software that alerts when there is an emergency in Israel."
 readme = "README.md"
 license = "GPL-3.0"
@@ -20,6 +20,3 @@ dependencies = [
 
 [project.scripts]
 redcode = "redcode.__main__:entrypoint"
-
-[tool.setuptools]
-package-data = { "assets" = ["redcode/assets/*"] }
