@@ -7,6 +7,9 @@ def parse_func(message):
     if "type" in data and data["type"] in ["ANDROID_KEEPALIVE", "LATENCY_TEST_WS", "TEST_LATANCY_WS"]:
         return {"title": "", "alerts": []}
 
+    if "type" in data and data["type"] == "SYSTEM_MESSAGE":
+        return {"title": data["data"]["titleHe"], "alerts": [{"id": f"{data["id"]}_{data["time"]}", "cities": [data["data"]["bodyHe"]]}]}
+
     if "data" not in data or "cities" not in data["data"] or "notificationId" not in data["data"]:
         raise ValueError()
 
