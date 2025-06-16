@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "redcode"
-version = "0.0.7"
+version = "0.0.8"
 description = "A software that alerts when there is an emergency in Israel."
 readme = "README.md"
 license = "GPL-3.0"
